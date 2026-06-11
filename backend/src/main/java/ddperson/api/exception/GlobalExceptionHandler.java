@@ -66,10 +66,10 @@ public class GlobalExceptionHandler {
     private HttpStatus mapStatus(ErrorCode code) {
         return switch (code) {
             case VALIDATION_ERROR -> HttpStatus.BAD_REQUEST;
-            case UNAUTHORIZED -> HttpStatus.UNAUTHORIZED;
+            case UNAUTHORIZED, INVALID_CREDENTIALS, REFRESH_TOKEN_INVALID -> HttpStatus.UNAUTHORIZED;
             case FORBIDDEN -> HttpStatus.FORBIDDEN;
             case NOT_FOUND -> HttpStatus.NOT_FOUND;
-            case CONFLICT -> HttpStatus.CONFLICT;
+            case CONFLICT, EMAIL_TAKEN -> HttpStatus.CONFLICT;
             case RATE_LIMIT_EXCEEDED -> HttpStatus.TOO_MANY_REQUESTS;
             case EXTERNAL_SERVICE_ERROR -> HttpStatus.BAD_GATEWAY;
             case INTERNAL_ERROR -> HttpStatus.INTERNAL_SERVER_ERROR;
