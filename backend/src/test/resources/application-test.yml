@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dd_person
+    username: dd_person
+    password: dd_person
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+app:
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+  jwt:
+    access-token-ttl-minutes: 15
+    refresh-token-ttl-days: 7
+    secret: test-secret-at-least-32-characters-long
+  gigachat:
+    auth-key: ""
+    scope: GIGACHAT_API_PERS
+    model: GigaChat
+  storage:
+    portraits-path: ./storage/portraits
+  rate-limit:
+    generations-per-day: 10
+    generations-per-hour: 3

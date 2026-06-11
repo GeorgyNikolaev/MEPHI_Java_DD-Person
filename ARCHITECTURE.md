@@ -6,9 +6,10 @@
 
 ```
 DD_person/
-├── backend/                 ← Spring Boot (единственный pom.xml)
+├── backend/                 ← Spring Boot (pom.xml внутри backend/)
 │   ├── pom.xml
 │   └── src/main/java/ddperson/...
+│   └── src/main/resources/i18n/messages*.properties
 ├── frontend/                ← React SPA
 ├── docker-compose.yml       ← PostgreSQL + Redis
 ├── storage/portraits/       ← JPG-артефакты
