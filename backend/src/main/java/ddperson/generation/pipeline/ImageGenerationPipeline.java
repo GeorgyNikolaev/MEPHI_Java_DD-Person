@@ -3,8 +3,10 @@ package ddperson.generation.pipeline;
 import ddperson.domain.enums.GenerationStatus;
 import ddperson.domain.enums.GigachatCallType;
 import ddperson.gigachat.exception.GigaChatException;
+import ddperson.persistence.entity.CharacterEntity;
 import ddperson.persistence.entity.GenerationRequestEntity;
 import ddperson.persistence.entity.PortraitEntity;
+import ddperson.persistence.repository.CharacterRepository;
 import ddperson.persistence.repository.GenerationRequestRepository;
 import ddperson.service.GigaChatAuditEntry;
 import ddperson.service.GigaChatAuditService;
@@ -24,16 +26,19 @@ public class ImageGenerationPipeline {
     private static final Logger log = LoggerFactory.getLogger(ImageGenerationPipeline.class);
 
     private final GenerationRequestRepository requestRepository;
+    private final CharacterRepository characterRepository;
     private final ImageGenerationPort imageGenerationPort;
     private final PortraitStorageService storageService;
     private final GigaChatAuditService auditService;
 
     public ImageGenerationPipeline(
             GenerationRequestRepository requestRepository,
+            CharacterRepository characterRepository,
             ImageGenerationPort imageGenerationPort,
             PortraitStorageService storageService,
             GigaChatAuditService auditService) {
         this.requestRepository = requestRepository;
+        this.characterRepository = characterRepository;
         this.imageGenerationPort = imageGenerationPort;
         this.storageService = storageService;
         this.auditService = auditService;
@@ -82,6 +87,12 @@ public class ImageGenerationPipeline {
             portrait.setMimeType("image/jpeg");
             portrait.setFileSizeBytes((long) image.imageBytes().length);
             request.setPortrait(portrait);
+
+            CharacterEntity character = request.getCharacter();
+            if (character != null) {
+                character.setLastPortrait(portrait);
+                characterRepository.save(character);
+            }
 
             request.setStatus(GenerationStatus.COMPLETED);
             request.setCompletedAt(Instant.now());

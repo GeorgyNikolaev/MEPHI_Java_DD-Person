@@ -12,6 +12,7 @@ import ddperson.domain.exception.ResourceNotFoundException;
 import ddperson.generation.prompt.BuiltPrompt;
 import ddperson.generation.prompt.GenerationInput;
 import ddperson.generation.prompt.builder.PromptBuilder;
+import ddperson.persistence.entity.CharacterEntity;
 import ddperson.persistence.entity.GenerationParametersEntity;
 import ddperson.persistence.entity.GenerationRequestEntity;
 import ddperson.persistence.entity.UserEntity;
@@ -56,26 +57,43 @@ public class GenerationService {
 
     @Transactional
     public GenerationSummaryResponse create(CreateGenerationRequest request) {
+        return createInternal(toInput(request), null);
+    }
+
+    @Transactional
+    public GenerationSummaryResponse createFromCharacter(CharacterEntity character) {
+        CreateGenerationRequest request = new CreateGenerationRequest(
+                character.getDescription(),
+                character.getRoleArchetype(),
+                character.getUniverseStyle(),
+                character.getSeriousnessLevel(),
+                character.getExpressivenessLevel(),
+                character.getMood()
+        );
+        return createInternal(toInput(request), character);
+    }
+
+    private GenerationSummaryResponse createInternal(GenerationInput input, CharacterEntity character) {
         UUID userId = SecurityUtils.requireCurrentUserId();
         rateLimitService.checkAndIncrement(userId);
 
-        GenerationInput input = toInput(request);
         BuiltPrompt builtPrompt = promptBuilder.build(input);
 
         UserEntity user = userRepository.getReferenceById(userId);
         GenerationRequestEntity entity = new GenerationRequestEntity();
         entity.setUser(user);
+        entity.setCharacter(character);
         entity.setStatus(GenerationStatus.PENDING);
         entity.setBuiltSystemPrompt(builtPrompt.systemPrompt());
         entity.setBuiltUserPrompt(builtPrompt.userPrompt());
 
         GenerationParametersEntity parameters = new GenerationParametersEntity();
-        parameters.setCharacterDescription(request.characterDescription());
-        parameters.setRoleArchetype(request.roleArchetype());
-        parameters.setUniverseStyle(request.universeStyle());
-        parameters.setSeriousnessLevel(request.seriousnessLevel());
-        parameters.setExpressivenessLevel(request.expressivenessLevel());
-        parameters.setMood(request.mood());
+        parameters.setCharacterDescription(input.characterDescription());
+        parameters.setRoleArchetype(input.roleArchetype());
+        parameters.setUniverseStyle(input.universeStyle());
+        parameters.setSeriousnessLevel(input.seriousnessLevel());
+        parameters.setExpressivenessLevel(input.expressivenessLevel());
+        parameters.setMood(input.mood());
         entity.setParameters(parameters);
 
         GenerationRequestEntity saved = requestRepository.save(entity);

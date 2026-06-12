@@ -19,6 +19,7 @@ public final class MessageCode {
     public static final String ERROR_INVALID_CREDENTIALS = "error.invalid_credentials";
     public static final String ERROR_EMAIL_TAKEN = "error.email_taken";
     public static final String ERROR_REFRESH_TOKEN_INVALID = "error.refresh_token_invalid";
+    public static final String ERROR_FAVORITE_ALREADY_EXISTS = "error.favorite_already_exists";
 
     public static final String SUCCESS_HEALTH_OK = "success.health.ok";
     public static final String SUCCESS_REGISTER = "success.register";
@@ -26,4 +27,6 @@ public final class MessageCode {
     public static final String SUCCESS_LOGOUT = "success.logout";
     public static final String SUCCESS_TOKEN_REFRESHED = "success.token_refreshed";
     public static final String SUCCESS_PING = "success.ping";
+    public static final String SUCCESS_FAVORITE_ADDED = "success.favorite.added";
+    public static final String SUCCESS_FAVORITE_REMOVED = "success.favorite.removed";
 }

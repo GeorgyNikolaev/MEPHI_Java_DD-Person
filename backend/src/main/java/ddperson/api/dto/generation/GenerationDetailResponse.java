@@ -9,6 +9,8 @@ public record GenerationDetailResponse(
         UUID id,
         GenerationStatus status,
         String statusLabel,
+        UUID characterId,
+        String characterName,
         GenerationParametersDto parameters,
         BuiltPromptDto builtPrompt,
         PortraitSummaryDto portrait,

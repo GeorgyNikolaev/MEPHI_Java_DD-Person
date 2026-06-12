@@ -20,4 +20,6 @@ public interface GenerationRequestRepository extends JpaRepository<GenerationReq
             UUID userId, GenerationStatus status, Pageable pageable);
 
     List<GenerationRequestEntity> findByStatus(GenerationStatus status);
+
+    List<GenerationRequestEntity> findByCharacter_Id(UUID characterId);
 }
