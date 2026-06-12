@@ -43,10 +43,6 @@ export function HistoryPage() {
   }, [load]);
 
   const handleDelete = async (item: GenerationSummary) => {
-    if (item.status === 'PENDING' || item.status === 'PROCESSING') {
-      setError('Нельзя удалить запрос, пока выполняется генерация');
-      return;
-    }
     if (!window.confirm('Удалить этот запрос генерации? Портрет и запись в избранном также будут удалены.')) {
       return;
     }
@@ -102,9 +98,7 @@ export function HistoryPage() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => {
-                  const inProgress = item.status === 'PENDING' || item.status === 'PROCESSING';
-                  return (
+                {items.map((item) => (
                     <tr key={item.id}>
                       <td>{formatDate(item.createdAt)}</td>
                       <td>{formatDate(item.completedAt)}</td>
@@ -114,21 +108,18 @@ export function HistoryPage() {
                       <td>
                         <div className="favorite-card-actions">
                           <Link to={`/generations/${item.id}`}>Открыть</Link>
-                          {!inProgress && (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              disabled={deletingId === item.id}
-                              onClick={() => void handleDelete(item)}
-                            >
-                              Удалить
-                            </Button>
-                          )}
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            disabled={deletingId === item.id}
+                            onClick={() => void handleDelete(item)}
+                          >
+                            Удалить
+                          </Button>
                         </div>
                       </td>
                     </tr>
-                  );
-                })}
+                ))}
               </tbody>
             </table>
           </div>

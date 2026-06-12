@@ -166,10 +166,6 @@ public class GenerationService {
         GenerationRequestEntity entity = requestRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(ResourceNotFoundException::new);
 
-        if (entity.getStatus() == GenerationStatus.PENDING || entity.getStatus() == GenerationStatus.PROCESSING) {
-            throw new BusinessException(ErrorCode.GENERATION_IN_PROGRESS);
-        }
-
         PortraitEntity portrait = entity.getPortrait();
         String storagePath = portrait != null ? portrait.getStoragePath() : null;
 

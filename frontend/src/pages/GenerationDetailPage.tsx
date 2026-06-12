@@ -170,11 +170,9 @@ export function GenerationDetailPage() {
             <Button type="button" variant="ghost" onClick={() => void refresh()} disabled={busy}>
               Обновить
             </Button>
-            {!isInProgress && (
-              <Button type="button" variant="danger" onClick={() => void handleDelete()} disabled={busy}>
-                Удалить
-              </Button>
-            )}
+            <Button type="button" variant="danger" onClick={() => void handleDelete()} disabled={busy}>
+              Удалить
+            </Button>
           </div>
 
           {data.error && (
