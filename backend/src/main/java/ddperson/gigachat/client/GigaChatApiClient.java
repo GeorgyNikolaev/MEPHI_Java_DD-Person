@@ -3,6 +3,7 @@ package ddperson.gigachat.client;
 import ddperson.config.AppProperties;
 import ddperson.gigachat.dto.GigaChatChatRequest;
 import ddperson.gigachat.dto.GigaChatChatResponse;
+import ddperson.gigachat.dto.GigaChatChatResult;
 import ddperson.gigachat.exception.GigaChatException;
 import ddperson.redis.GigaChatTokenCache;
 import org.springframework.http.MediaType;
@@ -26,7 +27,7 @@ public class GigaChatApiClient {
         this.tokenCache = tokenCache;
     }
 
-    public String generateImage(String systemPrompt, String userPrompt) {
+    public GigaChatChatResult generateImage(String systemPrompt, String userPrompt) {
         return executeWithAuth(token -> {
             GigaChatChatRequest request = new GigaChatChatRequest(
                     properties.gigachat().model(),
@@ -51,7 +52,11 @@ public class GigaChatApiClient {
                 if (response == null || response.firstContent() == null) {
                     throw new GigaChatException("Пустой ответ chat/completions", null, "EMPTY_COMPLETION");
                 }
-                return response.firstContent();
+                return new GigaChatChatResult(
+                        response.firstContent(),
+                        response.model(),
+                        response.usageOrEmpty()
+                );
             } catch (WebClientResponseException ex) {
                 if (ex.getStatusCode().value() == 401) {
                     tokenCache.invalidate();

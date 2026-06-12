@@ -6,6 +6,7 @@ import ddperson.gigachat.exception.GigaChatException;
 import ddperson.persistence.entity.GenerationRequestEntity;
 import ddperson.persistence.entity.PortraitEntity;
 import ddperson.persistence.repository.GenerationRequestRepository;
+import ddperson.service.GigaChatAuditEntry;
 import ddperson.service.GigaChatAuditService;
 import ddperson.service.port.ImageGenerationPort;
 import ddperson.storage.PortraitStorageService;
@@ -61,8 +62,17 @@ public class ImageGenerationPipeline {
             );
 
             int duration = (int) (System.currentTimeMillis() - started);
-            auditService.log(userId, requestId, GigachatCallType.CHAT_COMPLETION, 200, duration,
-                    "imageId=" + image.gigachatFileId(), null);
+            auditService.log(new GigaChatAuditEntry(
+                    userId,
+                    requestId,
+                    GigachatCallType.CHAT_COMPLETION,
+                    200,
+                    duration,
+                    "imageId=" + image.gigachatFileId(),
+                    null,
+                    image.model(),
+                    image.usage()
+            ));
 
             String storagePath = storageService.save(userId, requestId, image.imageBytes());
 
@@ -96,7 +106,8 @@ public class ImageGenerationPipeline {
             Integer httpStatus,
             long started) {
         int duration = (int) (System.currentTimeMillis() - started);
-        auditService.log(userId, requestId, GigachatCallType.CHAT_COMPLETION, httpStatus, duration, message, code);
+        auditService.log(new GigaChatAuditEntry(
+                userId, requestId, GigachatCallType.CHAT_COMPLETION, httpStatus, duration, message, code, null, null));
 
         request.setStatus(GenerationStatus.FAILED);
         request.setErrorCode(code);

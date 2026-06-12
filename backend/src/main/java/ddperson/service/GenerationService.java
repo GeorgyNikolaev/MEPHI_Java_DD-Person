@@ -1,5 +1,6 @@
 package ddperson.service;
 
+import ddperson.api.dto.common.PageResponse;
 import ddperson.api.dto.generation.CreateGenerationRequest;
 import ddperson.api.dto.generation.GenerationDetailResponse;
 import ddperson.api.dto.generation.GenerationSummaryResponse;
@@ -21,7 +22,8 @@ import ddperson.security.SecurityUtils;
 import ddperson.service.event.GenerationRequestedEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -90,12 +92,16 @@ public class GenerationService {
     }
 
     @Transactional(readOnly = true)
-    public Page<GenerationSummaryResponse> list(GenerationStatus status, Pageable pageable) {
+    public PageResponse<GenerationSummaryResponse> list(GenerationStatus status, int page, int size) {
         UUID userId = SecurityUtils.requireCurrentUserId();
-        Page<GenerationRequestEntity> page = status == null
+        int safePage = Math.max(page, 0);
+        int safeSize = Math.min(Math.max(size, 1), 100);
+        PageRequest pageable = PageRequest.of(safePage, safeSize, Sort.by(Sort.Direction.DESC, "createdAt"));
+
+        Page<GenerationRequestEntity> result = status == null
                 ? requestRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable)
                 : requestRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, status, pageable);
-        return page.map(mapper::toSummary);
+        return PageResponse.from(result.map(mapper::toSummary));
     }
 
     @Transactional

@@ -51,6 +51,21 @@ public class GigachatApiCallEntity {
     @Column(name = "error_code", length = 50)
     private String errorCode;
 
+    @Column(name = "model", length = 100)
+    private String model;
+
+    @Column(name = "prompt_tokens")
+    private Integer promptTokens;
+
+    @Column(name = "completion_tokens")
+    private Integer completionTokens;
+
+    @Column(name = "system_tokens")
+    private Integer systemTokens;
+
+    @Column(name = "total_tokens")
+    private Integer totalTokens;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt = Instant.now();
 
@@ -124,6 +139,46 @@ public class GigachatApiCallEntity {
 
     public void setErrorCode(String errorCode) {
         this.errorCode = errorCode;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
+    public void setModel(String model) {
+        this.model = model;
+    }
+
+    public Integer getPromptTokens() {
+        return promptTokens;
+    }
+
+    public void setPromptTokens(Integer promptTokens) {
+        this.promptTokens = promptTokens;
+    }
+
+    public Integer getCompletionTokens() {
+        return completionTokens;
+    }
+
+    public void setCompletionTokens(Integer completionTokens) {
+        this.completionTokens = completionTokens;
+    }
+
+    public Integer getSystemTokens() {
+        return systemTokens;
+    }
+
+    public void setSystemTokens(Integer systemTokens) {
+        this.systemTokens = systemTokens;
+    }
+
+    public Integer getTotalTokens() {
+        return totalTokens;
+    }
+
+    public void setTotalTokens(Integer totalTokens) {
+        this.totalTokens = totalTokens;
     }
 
     public Instant getCreatedAt() {

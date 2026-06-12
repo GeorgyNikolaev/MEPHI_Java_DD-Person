@@ -14,6 +14,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -43,6 +44,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(
                 buildError(HttpStatus.BAD_GATEWAY, ErrorCode.EXTERNAL_SERVICE_ERROR.name(),
                         messages.get(ErrorCode.EXTERNAL_SERVICE_ERROR.getMessageKey()), request));
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiErrorResponse> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+        return ResponseEntity.badRequest().body(
+                buildError(HttpStatus.BAD_REQUEST, ErrorCode.VALIDATION_ERROR.name(),
+                        messages.get(ErrorCode.VALIDATION_ERROR.getMessageKey()), request));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

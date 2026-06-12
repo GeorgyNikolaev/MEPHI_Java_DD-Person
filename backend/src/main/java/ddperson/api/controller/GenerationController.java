@@ -1,5 +1,6 @@
 package ddperson.api.controller;
 
+import ddperson.api.dto.common.PageResponse;
 import ddperson.api.dto.generation.CreateGenerationRequest;
 import ddperson.api.dto.generation.GenerationDetailResponse;
 import ddperson.api.dto.generation.GenerationSummaryResponse;
@@ -9,9 +10,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,10 +43,11 @@ public class GenerationController {
 
     @GetMapping
     @Operation(summary = "История запросов")
-    public Page<GenerationSummaryResponse> list(
+    public PageResponse<GenerationSummaryResponse> list(
             @RequestParam(required = false) GenerationStatus status,
-            @PageableDefault(size = 20) Pageable pageable) {
-        return generationService.list(status, pageable);
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return generationService.list(status, page, size);
     }
 
     @GetMapping("/{id}")
