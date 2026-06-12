@@ -1,0 +1,41 @@
+package ddperson.storage;
+
+import ddperson.config.AppProperties;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
+
+@Service
+public class PortraitStorageService {
+
+    private final Path basePath;
+
+    public PortraitStorageService(AppProperties properties) {
+        this.basePath = Paths.get(properties.storage().portraitsPath()).toAbsolutePath().normalize();
+    }
+
+    public String save(UUID userId, UUID requestId, byte[] imageBytes) throws IOException {
+        Path userDir = basePath.resolve(userId.toString());
+        Files.createDirectories(userDir);
+        String relative = userId + "/" + requestId + ".jpg";
+        Path target = basePath.resolve(relative);
+        Files.write(target, imageBytes);
+        return relative;
+    }
+
+    public byte[] read(String relativePath) throws IOException {
+        Path file = basePath.resolve(relativePath).normalize();
+        if (!file.startsWith(basePath) || !Files.exists(file)) {
+            throw new IOException("Файл не найден: " + relativePath);
+        }
+        return Files.readAllBytes(file);
+    }
+
+    public Path resolve(String relativePath) {
+        return basePath.resolve(relativePath).normalize();
+    }
+}

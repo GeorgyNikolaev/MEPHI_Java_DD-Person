@@ -4,6 +4,7 @@ import ddperson.api.ApiMessages;
 import ddperson.api.dto.ApiErrorResponse;
 import ddperson.domain.exception.BusinessException;
 import ddperson.domain.exception.ErrorCode;
+import ddperson.gigachat.exception.GigaChatException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,13 @@ public class GlobalExceptionHandler {
         HttpStatus status = mapStatus(code);
         String message = messages.get(code.getMessageKey());
         return ResponseEntity.status(status).body(buildError(status, code.name(), message, request));
+    }
+
+    @ExceptionHandler(GigaChatException.class)
+    public ResponseEntity<ApiErrorResponse> handleGigaChat(GigaChatException ex, HttpServletRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(
+                buildError(HttpStatus.BAD_GATEWAY, ErrorCode.EXTERNAL_SERVICE_ERROR.name(),
+                        messages.get(ErrorCode.EXTERNAL_SERVICE_ERROR.getMessageKey()), request));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

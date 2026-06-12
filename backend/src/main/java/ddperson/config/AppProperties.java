@@ -18,7 +18,16 @@ public record AppProperties(
     public record Jwt(int accessTokenTtlMinutes, int refreshTokenTtlDays, String secret) {
     }
 
-    public record Gigachat(String authKey, String scope, String model) {
+    public record Gigachat(
+            String authKey,
+            String scope,
+            String model,
+            String baseUrl,
+            String oauthUrl,
+            int connectTimeoutMs,
+            int readTimeoutMs,
+            boolean insecureSsl
+    ) {
     }
 
     public record Storage(String portraitsPath) {
