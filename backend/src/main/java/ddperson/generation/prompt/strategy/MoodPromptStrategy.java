@@ -13,12 +13,4 @@ public class MoodPromptStrategy implements PromptStrategy {
         }
         return "Настроение портрета: " + input.mood().getLabelRu() + ".";
     }
-
-    @Override
-    public String userFragment(GenerationInput input) {
-        if (input.mood() == null) {
-            return "";
-        }
-        return "Настроение: " + input.mood().getLabelRu() + ".";
-    }
 }

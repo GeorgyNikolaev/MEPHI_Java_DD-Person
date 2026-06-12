@@ -14,12 +14,6 @@ public class TonePromptStrategy implements PromptStrategy {
                 + expressivenessHint(input.expressivenessLevel()) + ".";
     }
 
-    @Override
-    public String userFragment(GenerationInput input) {
-        return "Серьёзность " + input.seriousnessLevel() + "/10, выразительность "
-                + input.expressivenessLevel() + "/10.";
-    }
-
     private String seriousnessHint(short level) {
         if (level <= 3) {
             return "лёгкий, почти комичный тон";

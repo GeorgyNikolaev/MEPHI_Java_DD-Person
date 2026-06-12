@@ -23,20 +23,17 @@ public class PromptBuilder {
     }
 
     public BuiltPrompt build(GenerationInput input) {
-        String system = strategies.stream()
+        String styleHints = strategies.stream()
                 .map(s -> s.systemFragment(input))
                 .filter(s -> !s.isBlank())
                 .collect(Collectors.joining(" "));
 
-        String userHints = strategies.stream()
-                .map(s -> s.userFragment(input))
-                .filter(s -> !s.isBlank())
-                .collect(Collectors.joining(" "));
+        String systemPrompt = SYSTEM_BASE + " " + styleHints;
 
+        // User — только описание персонажа и триггер text2image (без повтора параметров)
         String userPrompt = "Нарисуй портрет персонажа D&D: " + input.characterDescription().trim()
-                + ". " + userHints
-                + " Один портрет, фокус на лице персонажа.";
+                + ". Один портрет, фокус на лице персонажа.";
 
-        return new BuiltPrompt(SYSTEM_BASE + " " + system, userPrompt);
+        return new BuiltPrompt(systemPrompt, userPrompt);
     }
 }
