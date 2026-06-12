@@ -15,6 +15,7 @@
 | [launch.md](launch.md) | Инструкция запуска (Windows / macOS / Linux) |
 | [stack.md](stack.md) | Технологический стек |
 | [database.md](database.md) | Как создаются таблицы и выполняются запросы (JPA/Hibernate) |
+| [er-diagram.md](er-diagram.md) | ER-диаграмма сущностей БД |
 | [class-diagram.md](class-diagram.md) | Диаграмма классов (основные слои) |
 | [sequence-generation.md](sequence-generation.md) | Sequence: генерация портрета |
 | [sequence-favorites.md](sequence-favorites.md) | Sequence: избранное |

@@ -145,5 +145,5 @@ cd frontend && npm install && npm run dev
 - Диаграмма классов: [class-diagram.md](class-diagram.md)
 - Sequence-диаграммы: [генерация](sequence-generation.md), [избранное](sequence-favorites.md), [персонажи](sequence-characters.md)
 - Сценарии использования: [use-cases.md](use-cases.md)
-- База данных: [database.md](database.md)
+- База данных: [database.md](database.md), ER-диаграмма: [er-diagram.md](er-diagram.md)
 - Тест-кейсы: [test-cases.md](test-cases.md)

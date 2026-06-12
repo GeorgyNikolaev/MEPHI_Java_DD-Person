@@ -7,7 +7,7 @@
 
 Отдельный `init.sql` или Liquibase **намеренно не используются** — это осознанное решение для localhost-разработки (`ddl-auto: update`).
 
-Для отчёта преподавателю подготовлен **справочный DDL** и **примеры SELECT**: [db/reference-schema.sql](db/reference-schema.sql), [db/example-queries.sql](db/example-queries.sql).
+Для отчёта преподавателю подготовлены **ER-диаграмма**, **справочный DDL** и **примеры SELECT**: [er-diagram.md](er-diagram.md), [db/reference-schema.sql](db/reference-schema.sql), [db/example-queries.sql](db/example-queries.sql).
 
 ---
 
