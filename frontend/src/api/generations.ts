@@ -1,4 +1,5 @@
 import { api } from '@/api/client';
+import { toGenerationPayload } from '@/api/generationPayload';
 import type {
   GenerationDetail,
   GenerationFormValues,
@@ -7,20 +8,9 @@ import type {
   PageResponse,
 } from '@/types/api';
 
-function toPayload(values: GenerationFormValues) {
-  return {
-    characterDescription: values.characterDescription,
-    roleArchetype: values.roleArchetype,
-    universeStyle: values.universeStyle,
-    seriousnessLevel: values.seriousnessLevel,
-    expressivenessLevel: values.expressivenessLevel,
-    mood: values.mood || null,
-  };
-}
-
 export const generationsApi = {
   create: (values: GenerationFormValues) =>
-    api.post<GenerationSummary>('/api/v1/generations', toPayload(values)),
+    api.post<GenerationSummary>('/api/v1/generations', toGenerationPayload(values)),
 
   list: (params: { status?: GenerationStatus; page?: number; size?: number } = {}) => {
     const search = new URLSearchParams();
