@@ -87,18 +87,17 @@ public class ImageGenerationPipeline {
             portrait.setMimeType("image/jpeg");
             portrait.setFileSizeBytes((long) image.imageBytes().length);
             request.setPortrait(portrait);
-
-            CharacterEntity character = request.getCharacter();
-            if (character != null) {
-                character.setLastPortrait(portrait);
-                characterRepository.save(character);
-            }
-
             request.setStatus(GenerationStatus.COMPLETED);
             request.setCompletedAt(Instant.now());
             request.setErrorCode(null);
             request.setErrorMessage(null);
             requestRepository.save(request);
+
+            CharacterEntity character = request.getCharacter();
+            if (character != null) {
+                character.setLastPortrait(request.getPortrait());
+                characterRepository.save(character);
+            }
 
         } catch (GigaChatException ex) {
             fail(request, userId, requestId, ex.getErrorCode(), ex.getMessage(), ex.getHttpStatus(), started);
