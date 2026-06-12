@@ -17,6 +17,7 @@
 | [database.md](database.md) | Как создаются таблицы и выполняются запросы (JPA/Hibernate) |
 | [er-diagram.md](er-diagram.md) | ER-диаграмма сущностей БД |
 | [class-diagram.md](class-diagram.md) | Диаграмма классов (основные слои) |
+| [class-diagram-slide.md](class-diagram-slide.md) | Упрощённая диаграмма для слайда презентации |
 | [sequence-generation.md](sequence-generation.md) | Sequence: генерация портрета |
 | [sequence-favorites.md](sequence-favorites.md) | Sequence: избранное |
 | [sequence-characters.md](sequence-characters.md) | Sequence: персонажи |
