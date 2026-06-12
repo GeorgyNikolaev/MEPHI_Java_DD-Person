@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { formatDate } from '@/api/client';
 import { formatErrorMessage } from '@/api/errors';
 import { favoritesApi } from '@/api/favorites';
@@ -117,7 +117,7 @@ export function GenerationDetailPage() {
   }
 
   const isInProgress = data.status === 'PENDING' || data.status === 'PROCESSING';
-  const canCreateCharacter = data.parameters != null && !data.characterId;
+  const canCreateCharacter = data.parameters != null;
 
   return (
     <>
@@ -183,15 +183,6 @@ export function GenerationDetailPage() {
         </div>
 
         <div>
-          {data.characterName && (
-            <div className="panel">
-              <h2>Персонаж</h2>
-              <p>
-                <Link to={`/characters/${data.characterId}`}>{data.characterName}</Link>
-              </p>
-            </div>
-          )}
-
           {data.parameters && (
             <div className="panel">
               <h2>Параметры</h2>

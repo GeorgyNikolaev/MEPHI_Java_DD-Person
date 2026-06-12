@@ -39,16 +39,10 @@ public class GenerationMapper {
             error = new GenerationErrorDto(entity.getErrorCode(), entity.getErrorMessage());
         }
 
-        var character = entity.getCharacter();
-        UUID characterId = character != null ? character.getId() : null;
-        String characterName = character != null ? character.getName() : null;
-
         return new GenerationDetailResponse(
                 entity.getId(),
                 entity.getStatus(),
                 entity.getStatus().getLabelRu(),
-                characterId,
-                characterName,
                 toParametersDto(params),
                 new BuiltPromptDto(entity.getBuiltSystemPrompt(), entity.getBuiltUserPrompt()),
                 dtoMapper.toPortraitDto(entity.getPortrait()),

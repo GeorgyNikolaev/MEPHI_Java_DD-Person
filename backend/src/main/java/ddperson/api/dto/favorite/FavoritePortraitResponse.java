@@ -13,8 +13,6 @@ public record FavoritePortraitResponse(
         String characterDescription,
         EnumLabelDto roleArchetype,
         EnumLabelDto universeStyle,
-        UUID characterId,
-        String characterName,
         Instant favoritedAt
 ) {
 }

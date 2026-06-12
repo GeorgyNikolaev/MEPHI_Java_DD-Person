@@ -9,7 +9,6 @@ import ddperson.api.dto.common.PageResponse;
 import ddperson.api.dto.generation.GenerationSummaryResponse;
 import ddperson.api.mapper.CharacterMapper;
 import ddperson.domain.exception.BusinessException;
-import ddperson.domain.exception.ConflictException;
 import ddperson.domain.exception.ErrorCode;
 import ddperson.domain.exception.ResourceNotFoundException;
 import ddperson.persistence.entity.CharacterEntity;
@@ -69,10 +68,6 @@ public class CharacterService {
         GenerationRequestEntity generation = generationRequestRepository.findByIdAndUserId(generationId, userId)
                 .orElseThrow(ResourceNotFoundException::new);
 
-        if (generation.getCharacter() != null) {
-            throw new ConflictException();
-        }
-
         GenerationParametersEntity params = generation.getParameters();
         if (params == null) {
             throw new BusinessException(ErrorCode.VALIDATION_ERROR);
@@ -95,11 +90,7 @@ public class CharacterService {
             entity.setLastPortrait(generation.getPortrait());
         }
 
-        CharacterEntity saved = characterRepository.save(entity);
-        generation.setCharacter(saved);
-        generationRequestRepository.save(generation);
-
-        return mapper.toDetail(saved);
+        return mapper.toDetail(characterRepository.save(entity));
     }
 
     @Transactional(readOnly = true)

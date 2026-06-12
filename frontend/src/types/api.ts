@@ -98,8 +98,6 @@ export interface GenerationSummary {
 }
 
 export interface GenerationDetail extends GenerationSummary {
-  characterId: string | null;
-  characterName: string | null;
   parameters: GenerationParameters | null;
   builtPrompt: BuiltPrompt | null;
   portrait: PortraitSummary | null;
@@ -131,8 +129,6 @@ export interface FavoritePortrait {
   characterDescription: string | null;
   roleArchetype: EnumLabelDto | null;
   universeStyle: EnumLabelDto | null;
-  characterId: string | null;
-  characterName: string | null;
   favoritedAt: string;
 }
 

@@ -19,7 +19,6 @@ public class FavoriteMapper {
         var portrait = favorite.getPortrait();
         GenerationRequestEntity request = portrait.getRequest();
         GenerationParametersEntity params = request != null ? request.getParameters() : null;
-        var character = request != null ? request.getCharacter() : null;
 
         return new FavoritePortraitResponse(
                 favorite.getId(),
@@ -28,8 +27,6 @@ public class FavoriteMapper {
                 params != null ? params.getCharacterDescription() : null,
                 params != null ? dtoMapper.toEnumDto(params.getRoleArchetype()) : null,
                 params != null ? dtoMapper.toEnumDto(params.getUniverseStyle()) : null,
-                character != null ? character.getId() : null,
-                character != null ? character.getName() : null,
                 favorite.getCreatedAt()
         );
     }

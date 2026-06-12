@@ -96,16 +96,6 @@ export function FavoritesPage() {
                     {item.roleArchetype?.labelRu}
                     {item.universeStyle ? ` · ${item.universeStyle.labelRu}` : ''}
                   </div>
-                  {item.characterName && item.characterId && (
-                    <div className="character-meta">
-                      <Link
-                        to={`/characters/${item.characterId}`}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {item.characterName}
-                      </Link>
-                    </div>
-                  )}
                   <div className="character-meta">Добавлено: {formatDate(item.favoritedAt)}</div>
                   <div className="favorite-card-actions">
                     {item.generationId && (
