@@ -35,15 +35,27 @@ cp .env.example .env   # заполните GIGACHAT_AUTH_KEY и JWT_SECRET
 java -jar target/dd-person-backend.jar
 ```
 
-### Windows: `run.bat`
+### Windows: `run.bat` / macOS: `run.sh`
 
-В корне репозитория — `run.bat`:
+В корне репозитория:
 
-1. Укажите путь к JDK 21 в переменной `JAVA_HOME`
-2. При отсутствии JAR выполнит `mvn package`
-3. Запустит `java -jar backend\target\dd-person-backend.jar`
+| ОС | Скрипт | Запуск |
+|----|--------|--------|
+| Windows | `run.bat` | двойной клик или `run.bat` в cmd |
+| macOS / Linux | `run.sh` | `./run.sh` в терминале |
+
+Скрипт:
+1. Проверяет наличие Java (JDK 21)
+2. При отсутствии JAR выполняет `mvn package`
+3. Запускает `java -jar backend/target/dd-person-backend.jar`
 
 Перед запуском: `docker compose up -d`.
+
+На macOS, если несколько версий Java:
+```bash
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+./run.sh
+```
 
 ### Разработка (без JAR)
 

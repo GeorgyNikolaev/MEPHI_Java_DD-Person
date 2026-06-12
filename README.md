@@ -26,6 +26,9 @@ cd backend && mvn package -DskipTests && java -jar target/dd-person-backend.jar
 
 # Windows: run.bat в корне (укажите JAVA_HOME → JDK 21)
 
+# macOS / Linux:
+./run.sh
+
 # Frontend
 cd frontend && npm install && npm run dev
 ```
