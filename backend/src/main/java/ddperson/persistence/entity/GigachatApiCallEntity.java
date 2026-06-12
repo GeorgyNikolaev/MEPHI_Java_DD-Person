@@ -42,9 +42,6 @@ public class GigachatApiCallEntity {
     @Column(name = "duration_ms", nullable = false)
     private int durationMs;
 
-    @Column(name = "request_payload_hash", length = 64)
-    private String requestPayloadHash;
-
     @Column(name = "response_summary", columnDefinition = "TEXT")
     private String responseSummary;
 
@@ -115,14 +112,6 @@ public class GigachatApiCallEntity {
 
     public void setDurationMs(int durationMs) {
         this.durationMs = durationMs;
-    }
-
-    public String getRequestPayloadHash() {
-        return requestPayloadHash;
-    }
-
-    public void setRequestPayloadHash(String requestPayloadHash) {
-        this.requestPayloadHash = requestPayloadHash;
     }
 
     public String getResponseSummary() {

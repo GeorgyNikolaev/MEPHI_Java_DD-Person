@@ -86,6 +86,10 @@ public class ImageGenerationPipeline {
             portrait.setStoragePath(storagePath);
             portrait.setMimeType("image/jpeg");
             portrait.setFileSizeBytes((long) image.imageBytes().length);
+            storageService.readJpegDimensions(image.imageBytes()).ifPresent(dims -> {
+                portrait.setWidth(dims.width());
+                portrait.setHeight(dims.height());
+            });
             request.setPortrait(portrait);
             request.setStatus(GenerationStatus.COMPLETED);
             request.setCompletedAt(Instant.now());

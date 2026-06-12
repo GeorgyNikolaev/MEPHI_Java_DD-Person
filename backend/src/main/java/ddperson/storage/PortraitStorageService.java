@@ -3,10 +3,16 @@ package ddperson.storage;
 import ddperson.config.AppProperties;
 import org.springframework.stereotype.Service;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -16,6 +22,27 @@ public class PortraitStorageService {
 
     public PortraitStorageService(AppProperties properties) {
         this.basePath = Paths.get(properties.storage().portraitsPath()).toAbsolutePath().normalize();
+    }
+
+    public record ImageDimensions(int width, int height) {
+    }
+
+    public Optional<ImageDimensions> readJpegDimensions(byte[] imageBytes) {
+        try (ImageInputStream stream = ImageIO.createImageInputStream(new ByteArrayInputStream(imageBytes))) {
+            Iterator<ImageReader> readers = ImageIO.getImageReadersByFormatName("jpeg");
+            if (!readers.hasNext()) {
+                return Optional.empty();
+            }
+            ImageReader reader = readers.next();
+            try {
+                reader.setInput(stream, true, true);
+                return Optional.of(new ImageDimensions(reader.getWidth(0), reader.getHeight(0)));
+            } finally {
+                reader.dispose();
+            }
+        } catch (IOException ex) {
+            return Optional.empty();
+        }
     }
 
     public String save(UUID userId, UUID requestId, byte[] imageBytes) throws IOException {
