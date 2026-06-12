@@ -2,13 +2,18 @@ package ddperson.service;
 
 import ddperson.api.dto.character.CharacterResponse;
 import ddperson.api.dto.character.CharacterSummaryResponse;
+import ddperson.api.dto.character.CreateCharacterFromGenerationRequest;
 import ddperson.api.dto.character.CreateCharacterRequest;
 import ddperson.api.dto.character.UpdateCharacterRequest;
 import ddperson.api.dto.common.PageResponse;
 import ddperson.api.dto.generation.GenerationSummaryResponse;
 import ddperson.api.mapper.CharacterMapper;
+import ddperson.domain.exception.BusinessException;
+import ddperson.domain.exception.ConflictException;
+import ddperson.domain.exception.ErrorCode;
 import ddperson.domain.exception.ResourceNotFoundException;
 import ddperson.persistence.entity.CharacterEntity;
+import ddperson.persistence.entity.GenerationParametersEntity;
 import ddperson.persistence.entity.GenerationRequestEntity;
 import ddperson.persistence.entity.UserEntity;
 import ddperson.persistence.repository.CharacterRepository;
@@ -56,6 +61,45 @@ public class CharacterService {
                 request.universeStyle(), request.seriousnessLevel(), request.expressivenessLevel(), request.mood());
 
         return mapper.toDetail(characterRepository.save(entity));
+    }
+
+    @Transactional
+    public CharacterResponse createFromGeneration(UUID generationId, CreateCharacterFromGenerationRequest request) {
+        UUID userId = SecurityUtils.requireCurrentUserId();
+        GenerationRequestEntity generation = generationRequestRepository.findByIdAndUserId(generationId, userId)
+                .orElseThrow(ResourceNotFoundException::new);
+
+        if (generation.getCharacter() != null) {
+            throw new ConflictException();
+        }
+
+        GenerationParametersEntity params = generation.getParameters();
+        if (params == null) {
+            throw new BusinessException(ErrorCode.VALIDATION_ERROR);
+        }
+
+        UserEntity user = userRepository.getReferenceById(userId);
+        CharacterEntity entity = new CharacterEntity();
+        entity.setUser(user);
+        applyFields(
+                entity,
+                request.name(),
+                params.getCharacterDescription(),
+                params.getRoleArchetype(),
+                params.getUniverseStyle(),
+                params.getSeriousnessLevel(),
+                params.getExpressivenessLevel(),
+                params.getMood());
+
+        if (generation.getPortrait() != null) {
+            entity.setLastPortrait(generation.getPortrait());
+        }
+
+        CharacterEntity saved = characterRepository.save(entity);
+        generation.setCharacter(saved);
+        generationRequestRepository.save(generation);
+
+        return mapper.toDetail(saved);
     }
 
     @Transactional(readOnly = true)

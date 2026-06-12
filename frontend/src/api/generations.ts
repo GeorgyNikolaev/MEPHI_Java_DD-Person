@@ -1,6 +1,7 @@
 import { api } from '@/api/client';
 import { toGenerationPayload } from '@/api/generationPayload';
 import type {
+  CharacterDetail,
   GenerationDetail,
   GenerationFormValues,
   GenerationStatus,
@@ -23,4 +24,7 @@ export const generationsApi = {
   get: (id: string) => api.get<GenerationDetail>(`/api/v1/generations/${id}`),
 
   retry: (id: string) => api.post<GenerationSummary>(`/api/v1/generations/${id}/retry`),
+
+  createCharacter: (generationId: string, name: string) =>
+    api.post<CharacterDetail>(`/api/v1/generations/${generationId}/character`, { name }),
 };

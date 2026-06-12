@@ -1,10 +1,13 @@
 package ddperson.api.controller;
 
+import ddperson.api.dto.character.CharacterResponse;
+import ddperson.api.dto.character.CreateCharacterFromGenerationRequest;
 import ddperson.api.dto.common.PageResponse;
 import ddperson.api.dto.generation.CreateGenerationRequest;
 import ddperson.api.dto.generation.GenerationDetailResponse;
 import ddperson.api.dto.generation.GenerationSummaryResponse;
 import ddperson.domain.enums.GenerationStatus;
+import ddperson.service.CharacterService;
 import ddperson.service.GenerationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -29,9 +32,11 @@ import java.util.UUID;
 public class GenerationController {
 
     private final GenerationService generationService;
+    private final CharacterService characterService;
 
-    public GenerationController(GenerationService generationService) {
+    public GenerationController(GenerationService generationService, CharacterService characterService) {
         this.generationService = generationService;
+        this.characterService = characterService;
     }
 
     @PostMapping
@@ -61,5 +66,16 @@ public class GenerationController {
     @Operation(summary = "Повторить генерацию", description = "Создаёт новый запрос с теми же параметрами")
     public GenerationSummaryResponse retry(@PathVariable UUID id) {
         return generationService.retry(id);
+    }
+
+    @PostMapping("/{id}/character")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(
+            summary = "Сохранить как персонажа",
+            description = "Создаёт шаблон персонажа из параметров запроса; портрет запроса становится lastPortrait")
+    public CharacterResponse createCharacter(
+            @PathVariable UUID id,
+            @Valid @RequestBody CreateCharacterFromGenerationRequest request) {
+        return characterService.createFromGeneration(id, request);
     }
 }

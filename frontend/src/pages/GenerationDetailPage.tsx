@@ -1,7 +1,6 @@
 import { useCallback, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { formatDate } from '@/api/client';
-import { charactersApi } from '@/api/characters';
 import { formatErrorMessage } from '@/api/errors';
 import { favoritesApi } from '@/api/favorites';
 import { generationsApi } from '@/api/generations';
@@ -15,23 +14,7 @@ import { StatusBadge } from '@/components/common/StatusBadge';
 import { PromptPreview } from '@/components/generation/PromptPreview';
 import { PortraitViewer } from '@/components/portrait/PortraitViewer';
 import { usePolling } from '@/hooks/usePolling';
-import type { CharacterFormValues, GenerationDetail, Mood, RoleArchetype, UniverseStyle } from '@/types/api';
-
-function parametersToCharacterForm(name: string, data: GenerationDetail): CharacterFormValues | null {
-  const params = data.parameters;
-  if (!params) {
-    return null;
-  }
-  return {
-    name,
-    characterDescription: params.characterDescription,
-    roleArchetype: params.roleArchetype.code as RoleArchetype,
-    universeStyle: params.universeStyle.code as UniverseStyle,
-    seriousnessLevel: params.seriousnessLevel,
-    expressivenessLevel: params.expressivenessLevel,
-    mood: (params.mood?.code ?? '') as Mood | '',
-  };
-}
+import type { GenerationDetail } from '@/types/api';
 
 export function GenerationDetailPage() {
   const { id = '' } = useParams();
@@ -81,12 +64,11 @@ export function GenerationDetailPage() {
 
   const handleCreateCharacter = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!data || !characterName.trim()) {
+    if (!characterName.trim()) {
       setActionError('Укажите имя персонажа');
       return;
     }
-    const formValues = parametersToCharacterForm(characterName.trim(), data);
-    if (!formValues) {
+    if (!data?.parameters) {
       setActionError('Нет параметров для сохранения персонажа');
       return;
     }
@@ -95,10 +77,10 @@ export function GenerationDetailPage() {
     setActionError(null);
     setCharacterMessage(null);
     try {
-      const created = await charactersApi.create(formValues);
+      const created = await generationsApi.createCharacter(id, characterName.trim());
       setCreateModalOpen(false);
       setCharacterName('');
-      setCharacterMessage(`Персонаж «${created.name}» сохранён`);
+      setCharacterMessage(`Персонаж «${created.name}» сохранён${created.lastPortrait ? ' с портретом' : ''}`);
       navigate(`/characters/${created.id}`);
     } catch (err) {
       setActionError(formatErrorMessage(err, 'Не удалось создать персонажа'));
@@ -246,7 +228,7 @@ export function GenerationDetailPage() {
       >
         <form id="create-character-form" onSubmit={handleCreateCharacter} className="form-grid">
           <p className="field-hint">
-            Параметры генерации будут сохранены как шаблон. Укажите имя персонажа.
+            Параметры и портрет этой генерации будут сохранены в шаблон. Укажите имя персонажа.
           </p>
           <Input
             label="Имя персонажа"
