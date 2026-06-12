@@ -20,6 +20,7 @@ public final class MessageCode {
     public static final String ERROR_EMAIL_TAKEN = "error.email_taken";
     public static final String ERROR_REFRESH_TOKEN_INVALID = "error.refresh_token_invalid";
     public static final String ERROR_FAVORITE_ALREADY_EXISTS = "error.favorite_already_exists";
+    public static final String ERROR_GENERATION_IN_PROGRESS = "error.generation_in_progress";
 
     public static final String SUCCESS_HEALTH_OK = "success.health.ok";
     public static final String SUCCESS_REGISTER = "success.register";

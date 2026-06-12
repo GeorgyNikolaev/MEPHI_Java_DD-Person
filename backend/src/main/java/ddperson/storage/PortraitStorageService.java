@@ -38,4 +38,18 @@ public class PortraitStorageService {
     public Path resolve(String relativePath) {
         return basePath.resolve(relativePath).normalize();
     }
+
+    public void deleteIfExists(String relativePath) {
+        if (relativePath == null || relativePath.isBlank()) {
+            return;
+        }
+        try {
+            Path file = basePath.resolve(relativePath).normalize();
+            if (file.startsWith(basePath)) {
+                Files.deleteIfExists(file);
+            }
+        } catch (IOException ex) {
+            throw new IllegalStateException("Не удалось удалить файл портрета: " + relativePath, ex);
+        }
+    }
 }

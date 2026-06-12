@@ -17,4 +17,6 @@ public interface CharacterRepository extends JpaRepository<CharacterEntity, UUID
     Page<CharacterEntity> findByUserIdOrderByUpdatedAtDesc(UUID userId, Pageable pageable);
 
     Optional<CharacterEntity> findByIdAndUserId(UUID id, UUID userId);
+
+    List<CharacterEntity> findByLastPortrait_Id(UUID portraitId);
 }

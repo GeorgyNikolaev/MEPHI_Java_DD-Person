@@ -62,6 +62,21 @@ export function GenerationDetailPage() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Удалить этот запрос генерации? Портрет и запись в избранном также будут удалены.')) {
+      return;
+    }
+    setBusy(true);
+    setActionError(null);
+    try {
+      await generationsApi.delete(id);
+      navigate('/history');
+    } catch (err) {
+      setActionError(formatErrorMessage(err, 'Не удалось удалить'));
+      setBusy(false);
+    }
+  };
+
   const handleCreateCharacter = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!characterName.trim()) {
@@ -155,6 +170,11 @@ export function GenerationDetailPage() {
             <Button type="button" variant="ghost" onClick={() => void refresh()} disabled={busy}>
               Обновить
             </Button>
+            {!isInProgress && (
+              <Button type="button" variant="danger" onClick={() => void handleDelete()} disabled={busy}>
+                Удалить
+              </Button>
+            )}
           </div>
 
           {data.error && (

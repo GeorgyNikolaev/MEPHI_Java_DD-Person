@@ -27,4 +27,6 @@ export const generationsApi = {
 
   createCharacter: (generationId: string, name: string) =>
     api.post<CharacterDetail>(`/api/v1/generations/${generationId}/character`, { name }),
+
+  delete: (id: string) => api.delete<void>(`/api/v1/generations/${id}`),
 };

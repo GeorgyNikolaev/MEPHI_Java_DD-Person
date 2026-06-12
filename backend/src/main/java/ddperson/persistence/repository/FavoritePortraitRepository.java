@@ -19,4 +19,6 @@ public interface FavoritePortraitRepository extends JpaRepository<FavoritePortra
     Optional<FavoritePortraitEntity> findByUserIdAndPortraitId(UUID userId, UUID portraitId);
 
     boolean existsByUserIdAndPortraitId(UUID userId, UUID portraitId);
+
+    void deleteByPortraitId(UUID portraitId);
 }

@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -59,6 +60,13 @@ public class GenerationController {
     @Operation(summary = "Детали запроса", description = "Статус, параметры, промпт, портрет или ошибка")
     public GenerationDetailResponse get(@PathVariable UUID id) {
         return generationService.getById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Удалить запрос генерации", description = "Удаляет запрос, портрет, файл JPG и записи в избранном")
+    public void delete(@PathVariable UUID id) {
+        generationService.delete(id);
     }
 
     @PostMapping("/{id}/retry")

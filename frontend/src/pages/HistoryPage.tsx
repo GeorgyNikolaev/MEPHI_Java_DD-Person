@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { formatDate } from '@/api/client';
+import { formatErrorMessage } from '@/api/errors';
 import { generationsApi } from '@/api/generations';
 import { Button } from '@/components/common/Button';
 import { ErrorAlert } from '@/components/common/ErrorAlert';
@@ -17,26 +18,49 @@ export function HistoryPage() {
   const [status, setStatus] = useState<GenerationStatus | ''>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await generationsApi.list({
+        page,
+        size: 15,
+        status: status || undefined,
+      });
+      setItems(result.content);
+      setTotalPages(result.totalPages);
+    } catch (err) {
+      setError(formatErrorMessage(err, 'Ошибка загрузки'));
+    } finally {
+      setLoading(false);
+    }
+  }, [page, status]);
 
   useEffect(() => {
-    void (async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const result = await generationsApi.list({
-          page,
-          size: 15,
-          status: status || undefined,
-        });
-        setItems(result.content);
-        setTotalPages(result.totalPages);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Ошибка загрузки');
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [page, status]);
+    void load();
+  }, [load]);
+
+  const handleDelete = async (item: GenerationSummary) => {
+    if (item.status === 'PENDING' || item.status === 'PROCESSING') {
+      setError('Нельзя удалить запрос, пока выполняется генерация');
+      return;
+    }
+    if (!window.confirm('Удалить этот запрос генерации? Портрет и запись в избранном также будут удалены.')) {
+      return;
+    }
+    setDeletingId(item.id);
+    setError(null);
+    try {
+      await generationsApi.delete(item.id);
+      await load();
+    } catch (err) {
+      setError(formatErrorMessage(err, 'Не удалось удалить'));
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <>
@@ -78,18 +102,33 @@ export function HistoryPage() {
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => (
-                  <tr key={item.id}>
-                    <td>{formatDate(item.createdAt)}</td>
-                    <td>{formatDate(item.completedAt)}</td>
-                    <td>
-                      <StatusBadge status={item.status} label={item.statusLabel} />
-                    </td>
-                    <td>
-                      <Link to={`/generations/${item.id}`}>Открыть</Link>
-                    </td>
-                  </tr>
-                ))}
+                {items.map((item) => {
+                  const inProgress = item.status === 'PENDING' || item.status === 'PROCESSING';
+                  return (
+                    <tr key={item.id}>
+                      <td>{formatDate(item.createdAt)}</td>
+                      <td>{formatDate(item.completedAt)}</td>
+                      <td>
+                        <StatusBadge status={item.status} label={item.statusLabel} />
+                      </td>
+                      <td>
+                        <div className="favorite-card-actions">
+                          <Link to={`/generations/${item.id}`}>Открыть</Link>
+                          {!inProgress && (
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              disabled={deletingId === item.id}
+                              onClick={() => void handleDelete(item)}
+                            >
+                              Удалить
+                            </Button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
