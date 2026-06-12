@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { ApiError, formatDate } from '@/api/client';
+import { Link, useNavigate } from 'react-router-dom';
+import { formatDate } from '@/api/client';
+import { formatErrorMessage } from '@/api/errors';
 import { favoritesApi } from '@/api/favorites';
 import { Button } from '@/components/common/Button';
 import { ErrorAlert } from '@/components/common/ErrorAlert';
@@ -10,6 +11,7 @@ import { PortraitViewer } from '@/components/portrait/PortraitViewer';
 import type { FavoritePortrait } from '@/types/api';
 
 export function FavoritesPage() {
+  const navigate = useNavigate();
   const [items, setItems] = useState<FavoritePortrait[]>([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -25,7 +27,7 @@ export function FavoritesPage() {
       setItems(result.content);
       setTotalPages(result.totalPages);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Ошибка загрузки');
+      setError(formatErrorMessage(err, 'Ошибка загрузки'));
     } finally {
       setLoading(false);
     }
@@ -35,16 +37,24 @@ export function FavoritesPage() {
     void load();
   }, [page]);
 
-  const handleRemove = async (portraitId: string) => {
+  const handleRemove = async (e: React.MouseEvent, portraitId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
     setBusyId(portraitId);
     setError(null);
     try {
       await favoritesApi.remove(portraitId);
       await load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Не удалось удалить');
+      setError(formatErrorMessage(err, 'Не удалось удалить'));
     } finally {
       setBusyId(null);
+    }
+  };
+
+  const openGeneration = (item: FavoritePortrait) => {
+    if (item.generationId) {
+      navigate(`/generations/${item.generationId}`);
     }
   };
 
@@ -64,7 +74,19 @@ export function FavoritesPage() {
         <>
           <div className="card-grid">
             {items.map((item) => (
-              <div key={item.id} className="character-card">
+              <div
+                key={item.id}
+                className={`character-card${item.generationId ? ' favorite-card-link' : ''}`}
+                onClick={() => openGeneration(item)}
+                onKeyDown={(e) => {
+                  if (item.generationId && (e.key === 'Enter' || e.key === ' ')) {
+                    e.preventDefault();
+                    openGeneration(item);
+                  }
+                }}
+                role={item.generationId ? 'link' : undefined}
+                tabIndex={item.generationId ? 0 : undefined}
+              >
                 <PortraitViewer portraitId={item.portrait.id} alt={item.characterDescription ?? 'Портрет'} />
                 <div style={{ marginTop: '0.75rem' }}>
                   <p style={{ marginBottom: '0.35rem' }}>
@@ -76,16 +98,29 @@ export function FavoritesPage() {
                   </div>
                   {item.characterName && item.characterId && (
                     <div className="character-meta">
-                      <Link to={`/characters/${item.characterId}`}>{item.characterName}</Link>
+                      <Link
+                        to={`/characters/${item.characterId}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {item.characterName}
+                      </Link>
                     </div>
                   )}
                   <div className="character-meta">Добавлено: {formatDate(item.favoritedAt)}</div>
-                  <div className="btn-row">
+                  <div className="favorite-card-actions">
+                    {item.generationId && (
+                      <Link
+                        to={`/generations/${item.generationId}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        Открыть
+                      </Link>
+                    )}
                     <Button
                       type="button"
                       variant="ghost"
                       disabled={busyId === item.portrait.id}
-                      onClick={() => void handleRemove(item.portrait.id)}
+                      onClick={(e) => void handleRemove(e, item.portrait.id)}
                     >
                       Убрать
                     </Button>

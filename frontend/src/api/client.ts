@@ -1,16 +1,7 @@
 import type { ApiErrorResponse } from '@/types/api';
+import { ApiError, NetworkError } from '@/api/errors';
 
-export class ApiError extends Error {
-  readonly status: number;
-  readonly body: ApiErrorResponse | null;
-
-  constructor(status: number, body: ApiErrorResponse | null) {
-    super(body?.message ?? `HTTP ${status}`);
-    this.name = 'ApiError';
-    this.status = status;
-    this.body = body;
-  }
-}
+export { ApiError, NetworkError } from '@/api/errors';
 
 const JSON_HEADERS = { 'Content-Type': 'application/json', Accept: 'application/json' };
 
@@ -26,14 +17,21 @@ async function parseBody<T>(response: Response): Promise<T | undefined> {
 }
 
 export async function apiRequest<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(path, {
-    credentials: 'include',
-    ...init,
-    headers: {
-      ...JSON_HEADERS,
-      ...init.headers,
-    },
-  });
+  let response: Response;
+  try {
+    response = await fetch(path, {
+      credentials: 'include',
+      ...init,
+      headers: {
+        ...JSON_HEADERS,
+        ...init.headers,
+      },
+    });
+  } catch {
+    throw new NetworkError(
+      'Не удалось связаться с сервером. Проверьте, что backend запущен на порту 8080 (mvn spring-boot:run или ./run.sh).',
+    );
+  }
 
   if (!response.ok) {
     const body = await parseBody<ApiErrorResponse>(response).catch(() => null);

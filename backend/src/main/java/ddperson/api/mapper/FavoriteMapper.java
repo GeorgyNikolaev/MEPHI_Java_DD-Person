@@ -24,6 +24,7 @@ public class FavoriteMapper {
         return new FavoritePortraitResponse(
                 favorite.getId(),
                 dtoMapper.toPortraitDto(portrait),
+                request != null ? request.getId() : null,
                 params != null ? params.getCharacterDescription() : null,
                 params != null ? dtoMapper.toEnumDto(params.getRoleArchetype()) : null,
                 params != null ? dtoMapper.toEnumDto(params.getUniverseStyle()) : null,

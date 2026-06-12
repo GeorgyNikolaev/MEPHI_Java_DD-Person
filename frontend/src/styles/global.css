@@ -564,6 +564,48 @@ th {
   font-size: 0.9rem;
 }
 
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  display: grid;
+  place-items: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.modal-panel {
+  width: min(420px, 100%);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow);
+}
+
+.modal-panel h2 {
+  margin-bottom: 1rem;
+}
+
+.favorite-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.favorite-card-link:hover {
+  text-decoration: none;
+}
+
+.favorite-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
 @media (max-width: 640px) {
   .navbar-inner {
     flex-wrap: wrap;

@@ -1,136 +1,231 @@
-# Диаграмма классов (основные слои)
+# Диаграмма классов
 
-Упрощённая диаграмма ключевых классов backend.
+Упрощённая диаграмма backend с русскими подписями. Все элементы связаны в единую структуру: клиент → API → сервисы → хранение / внешние системы.
 
 ```mermaid
 classDiagram
     direction TB
 
-  class GenerationController {
-    +create()
-    +list()
-    +get()
-    +retry()
-  }
-  class CharacterController {
-    +create()
-    +list()
-    +get()
-    +update()
-    +delete()
-    +generate()
-  }
-  class FavoriteController {
-    +list()
-  }
-  class PortraitController {
-    +image()
-    +addFavorite()
-    +removeFavorite()
-  }
-  class AuthController {
-    +register()
-    +login()
-    +refresh()
-    +logout()
-    +me()
-  }
+    class КлиентReact {
+        <<frontend>>
+        +авторизация()
+        +формаГенерации()
+        +историяИИзбранное()
+    }
 
-  class GenerationService {
-    +create()
-    +createFromCharacter()
-    +list()
-    +getById()
-    +retry()
-  }
-  class CharacterService {
-    +create()
-    +list()
-    +getById()
-    +update()
-    +delete()
-    +generatePortrait()
-  }
-  class FavoriteService {
-    +add()
-    +remove()
-    +list()
-  }
-  class AuthService {
-    +register()
-    +login()
-    +refresh()
-    +logout()
-    +me()
-  }
+    class КонтроллерАвторизации {
+        <<REST API>>
+        +регистрация()
+        +вход()
+        +выход()
+        +текущийПользователь()
+    }
 
-  class PromptBuilder {
-    +build()
-  }
-  class PromptStrategy {
-    <<interface>>
-    +systemFragment()
-  }
-  class ImageGenerationPipeline {
-    +execute()
-  }
-  class ImageGenerationPort {
-    <<interface>>
-    +generate()
-  }
-  class GigaChatImageAdapter {
-    +generate()
-  }
+    class КонтроллерГенераций {
+        <<REST API>>
+        +создатьЗапрос()
+        +список()
+        +детали()
+        +повторить()
+    }
 
-  class GenerationRequestEntity
-  class CharacterEntity
-  class PortraitEntity
-  class FavoritePortraitEntity
-  class UserEntity
+    class КонтроллерПерсонажей {
+        <<REST API>>
+        +создатьШаблон()
+        +список()
+        +обновить()
+        +генерацияПоШаблону()
+    }
 
-  class GenerationRequestRepository
-  class CharacterRepository
-  class FavoritePortraitRepository
-  class UserRepository
+    class КонтроллерПортретов {
+        <<REST API>>
+        +изображениеJpg()
+        +вИзбранное()
+        +изИзбранного()
+    }
 
-  GenerationController --> GenerationService
-  CharacterController --> CharacterService
-  FavoriteController --> FavoriteService
-  PortraitController --> FavoriteService
-  PortraitController --> PortraitService
-  AuthController --> AuthService
+    class КонтроллерИзбранного {
+        <<REST API>>
+        +списокИзбранного()
+    }
 
-  CharacterService --> GenerationService
-  GenerationService --> PromptBuilder
-  GenerationService --> GenerationRequestRepository
-  CharacterService --> CharacterRepository
-  FavoriteService --> FavoritePortraitRepository
+    class СервисАвторизации {
+        <<сервис>>
+        +регистрация()
+        +выдачаJwtCookies()
+        +ротацияRefresh()
+    }
 
-  PromptBuilder --> PromptStrategy
-  GenerationService ..> GenerationRequestedEvent : publish
-  ImageGenerationPipeline --> ImageGenerationPort
-  ImageGenerationPipeline --> GenerationRequestRepository
-  GigaChatImageAdapter ..|> ImageGenerationPort
+    class СервисГенераций {
+        <<сервис>>
+        +создать()
+        +изПерсонажа()
+        +лимитЗапросов()
+        +публикацияСобытия()
+    }
 
-  GenerationRequestRepository --> GenerationRequestEntity
-  CharacterRepository --> CharacterEntity
-  FavoritePortraitRepository --> FavoritePortraitEntity
-  UserRepository --> UserEntity
+    class СервисПерсонажей {
+        <<сервис>>
+        +crudШаблона()
+        +запускГенерации()
+    }
 
-  GenerationRequestEntity --> CharacterEntity
-  GenerationRequestEntity --> PortraitEntity
-  CharacterEntity --> PortraitEntity : lastPortrait
+    class СервисИзбранного {
+        <<сервис>>
+        +добавить()
+        +удалить()
+        +список()
+    }
+
+    class СборщикПромпта {
+        <<Builder>>
+        +собратьSystemUser()
+    }
+
+    class СтратегияПромпта {
+        <<Strategy>>
+        +фрагментSystem()
+    }
+
+    class КонвейерГенерации {
+        <<async pipeline>>
+        +выполнить()
+        +обновитьСтатус()
+    }
+
+    class ПортГенерацииИзображений {
+        <<интерфейс>>
+        +сгенерировать()
+    }
+
+    class АдаптерGigaChat {
+        <<Adapter>>
+        +oauth()
+        +chatCompletions()
+        +скачатьJpg()
+    }
+
+    class СервисЛимитов {
+        <<Redis>>
+        +проверитьИУвеличить()
+    }
+
+    class ХранилищеПортретов {
+        <<файлы>>
+        +сохранитьJpg()
+        +прочитать()
+    }
+
+    class РепозиторийЗапросов {
+        <<JPA>>
+        +сохранить()
+        +найтиПоПользователю()
+    }
+
+    class РепозиторийПерсонажей {
+        <<JPA>>
+        +crud()
+    }
+
+    class РепозиторийИзбранного {
+        <<JPA>>
+        +сохранить()
+        +списокПоПользователю()
+    }
+
+    class СущностьЗапросГенерации {
+        <<Entity>>
+        +статус
+        +промпт
+        +портрет
+    }
+
+    class СущностьПерсонаж {
+        <<Entity>>
+        +имя
+        +параметры
+        +последнийПортрет
+    }
+
+    class СущностьПортрет {
+        <<Entity>>
+        +путьКФайлу
+        +связьСЗапросом
+    }
+
+    class PostgreSQL {
+        <<СУБД>>
+    }
+
+    class Redis {
+        <<кэш>>
+    }
+
+    class GigaChatAPI {
+        <<внешний API>>
+    }
+
+    class ФайловаяСистема {
+        <<storage/portraits>>
+    }
+
+    КлиентReact --> КонтроллерАвторизации : HTTPS
+    КлиентReact --> КонтроллерГенераций
+    КлиентReact --> КонтроллерПерсонажей
+    КлиентReact --> КонтроллерПортретов
+    КлиентReact --> КонтроллерИзбранного
+
+    КонтроллерАвторизации --> СервисАвторизации
+    КонтроллерГенераций --> СервисГенераций
+    КонтроллерПерсонажей --> СервисПерсонажей
+    КонтроллерПортретов --> СервисИзбранного
+    КонтроллерИзбранного --> СервисИзбранного
+
+    СервисПерсонажей --> СервисГенераций
+    СервисГенераций --> СборщикПромпта
+    СервисГенераций --> СервисЛимитов
+    СервисГенераций --> РепозиторийЗапросов
+    СервисГенераций ..> КонвейерГенерации : событие AFTER_COMMIT
+
+    СборщикПромпта --> СтратегияПромпта
+    КонвейерГенерации --> ПортГенерацииИзображений
+    КонвейерГенерации --> ХранилищеПортретов
+    КонвейерГенерации --> РепозиторийЗапросов
+    АдаптерGigaChat ..|> ПортГенерацииИзображений
+    АдаптерGigaChat --> GigaChatAPI
+
+    СервисПерсонажей --> РепозиторийПерсонажей
+    СервисИзбранного --> РепозиторийИзбранного
+
+    РепозиторийЗапросов --> PostgreSQL
+    РепозиторийПерсонажей --> PostgreSQL
+    РепозиторийИзбранного --> PostgreSQL
+    СервисАвторизации --> PostgreSQL
+    СервисЛимитов --> Redis
+
+    РепозиторийЗапросов --> СущностьЗапросГенерации
+    РепозиторийПерсонажей --> СущностьПерсонаж
+    РепозиторийИзбранного --> СущностьПортрет
+
+    СущностьЗапросГенерации --> СущностьПерсонаж : character_id
+    СущностьЗапросГенерации --> СущностьПортрет : 1:1
+    СущностьПерсонаж --> СущностьПортрет : last_portrait
+    ХранилищеПортретов --> ФайловаяСистема
 ```
 
-## Пакеты
+## Легенда слоёв
 
-```
-ddperson.api          — контроллеры, DTO, мапперы
-ddperson.service      — сценарии использования
-ddperson.generation   — промпты и pipeline
-ddperson.gigachat     — интеграция GigaChat
-ddperson.persistence  — JPA-сущности и репозитории
-ddperson.security     — JWT, cookies, фильтры
-ddperson.redis        — rate limit, blacklist
-ddperson.storage      — файлы JPG
-```
+| Слой | Пакет | Назначение |
+|------|-------|------------|
+| REST API | `ddperson.api` | HTTP, DTO, мапперы |
+| Сервисы | `ddperson.service` | Сценарии использования |
+| Генерация | `ddperson.generation` | Промпты, async pipeline |
+| GigaChat | `ddperson.gigachat` | OAuth, API, адаптер |
+| Persistence | `ddperson.persistence` | JPA-сущности и репозитории |
+| Security | `ddperson.security` | JWT, cookies, фильтры |
+| Redis | `ddperson.redis` | Лимиты, blacklist, кэш OAuth |
+| Storage | `ddperson.storage` | JPG на диске |
+
+## Связанные диаграммы
+
+- [sequence-generation.md](sequence-generation.md) — последовательность генерации портрета

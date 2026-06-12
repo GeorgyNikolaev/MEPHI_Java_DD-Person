@@ -127,6 +127,7 @@ export interface CharacterDetail extends CharacterSummary {
 export interface FavoritePortrait {
   id: string;
   portrait: PortraitSummary;
+  generationId: string | null;
   characterDescription: string | null;
   roleArchetype: EnumLabelDto | null;
   universeStyle: EnumLabelDto | null;

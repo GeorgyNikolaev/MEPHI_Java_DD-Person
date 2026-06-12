@@ -1,24 +1,47 @@
 import { useCallback, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { ApiError, formatDate } from '@/api/client';
+import { formatDate } from '@/api/client';
+import { charactersApi } from '@/api/characters';
+import { formatErrorMessage } from '@/api/errors';
 import { favoritesApi } from '@/api/favorites';
 import { generationsApi } from '@/api/generations';
 import { Button } from '@/components/common/Button';
 import { ErrorAlert } from '@/components/common/ErrorAlert';
+import { Input } from '@/components/common/Input';
 import { Loader } from '@/components/common/Loader';
+import { Modal } from '@/components/common/Modal';
 import { PageHeader } from '@/components/common/PageHeader';
 import { StatusBadge } from '@/components/common/StatusBadge';
 import { PromptPreview } from '@/components/generation/PromptPreview';
 import { PortraitViewer } from '@/components/portrait/PortraitViewer';
 import { usePolling } from '@/hooks/usePolling';
-import type { GenerationDetail } from '@/types/api';
+import type { CharacterFormValues, GenerationDetail, Mood, RoleArchetype, UniverseStyle } from '@/types/api';
+
+function parametersToCharacterForm(name: string, data: GenerationDetail): CharacterFormValues | null {
+  const params = data.parameters;
+  if (!params) {
+    return null;
+  }
+  return {
+    name,
+    characterDescription: params.characterDescription,
+    roleArchetype: params.roleArchetype.code as RoleArchetype,
+    universeStyle: params.universeStyle.code as UniverseStyle,
+    seriousnessLevel: params.seriousnessLevel,
+    expressivenessLevel: params.expressivenessLevel,
+    mood: (params.mood?.code ?? '') as Mood | '',
+  };
+}
 
 export function GenerationDetailPage() {
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const [actionError, setActionError] = useState<string | null>(null);
   const [favoriteMessage, setFavoriteMessage] = useState<string | null>(null);
+  const [characterMessage, setCharacterMessage] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [characterName, setCharacterName] = useState('');
 
   const fetcher = useCallback(() => generationsApi.get(id), [id]);
   const shouldPoll = useCallback(
@@ -35,7 +58,7 @@ export function GenerationDetailPage() {
       const retried = await generationsApi.retry(id);
       navigate(`/generations/${retried.id}`);
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : 'Не удалось повторить');
+      setActionError(formatErrorMessage(err, 'Не удалось повторить'));
     } finally {
       setBusy(false);
     }
@@ -50,7 +73,35 @@ export function GenerationDetailPage() {
       const result = await favoritesApi.add(data.portrait.id);
       setFavoriteMessage(result.message);
     } catch (err) {
-      setActionError(err instanceof ApiError ? err.message : 'Не удалось добавить в избранное');
+      setActionError(formatErrorMessage(err, 'Не удалось добавить в избранное'));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleCreateCharacter = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!data || !characterName.trim()) {
+      setActionError('Укажите имя персонажа');
+      return;
+    }
+    const formValues = parametersToCharacterForm(characterName.trim(), data);
+    if (!formValues) {
+      setActionError('Нет параметров для сохранения персонажа');
+      return;
+    }
+
+    setBusy(true);
+    setActionError(null);
+    setCharacterMessage(null);
+    try {
+      const created = await charactersApi.create(formValues);
+      setCreateModalOpen(false);
+      setCharacterName('');
+      setCharacterMessage(`Персонаж «${created.name}» сохранён`);
+      navigate(`/characters/${created.id}`);
+    } catch (err) {
+      setActionError(formatErrorMessage(err, 'Не удалось создать персонажа'));
     } finally {
       setBusy(false);
     }
@@ -69,6 +120,7 @@ export function GenerationDetailPage() {
   }
 
   const isInProgress = data.status === 'PENDING' || data.status === 'PROCESSING';
+  const canCreateCharacter = data.parameters != null && !data.characterId;
 
   return (
     <>
@@ -80,6 +132,7 @@ export function GenerationDetailPage() {
 
       {actionError && <ErrorAlert message={actionError} />}
       {favoriteMessage && <div className="alert alert-info">{favoriteMessage}</div>}
+      {characterMessage && <div className="alert alert-info">{characterMessage}</div>}
       {isInProgress && (
         <div className="alert alert-info">
           Генерация выполняется… Страница обновляется автоматически.
@@ -105,6 +158,16 @@ export function GenerationDetailPage() {
             {data.portrait && (
               <Button type="button" variant="secondary" onClick={() => void handleFavorite()} disabled={busy}>
                 В избранное
+              </Button>
+            )}
+            {canCreateCharacter && (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setCreateModalOpen(true)}
+                disabled={busy}
+              >
+                Сохранить как персонажа
               </Button>
             )}
             <Button type="button" variant="ghost" onClick={() => void refresh()} disabled={busy}>
@@ -155,6 +218,48 @@ export function GenerationDetailPage() {
           />
         </div>
       </div>
+
+      <Modal
+        title="Сохранить как персонажа"
+        open={createModalOpen}
+        onClose={() => {
+          setCreateModalOpen(false);
+          setCharacterName('');
+        }}
+        footer={
+          <div className="btn-row">
+            <Button type="submit" form="create-character-form" disabled={busy || !characterName.trim()}>
+              {busy ? 'Сохранение…' : 'Создать'}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => {
+                setCreateModalOpen(false);
+                setCharacterName('');
+              }}
+            >
+              Отмена
+            </Button>
+          </div>
+        }
+      >
+        <form id="create-character-form" onSubmit={handleCreateCharacter} className="form-grid">
+          <p className="field-hint">
+            Параметры генерации будут сохранены как шаблон. Укажите имя персонажа.
+          </p>
+          <Input
+            label="Имя персонажа"
+            name="characterName"
+            value={characterName}
+            onChange={(e) => setCharacterName(e.target.value)}
+            placeholder="Аэlarion"
+            required
+            autoFocus
+            maxLength={150}
+          />
+        </form>
+      </Modal>
     </>
   );
 }

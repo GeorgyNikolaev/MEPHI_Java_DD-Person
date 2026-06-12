@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ApiError } from '@/api/client';
+import { formatErrorMessage } from '@/api/errors';
 import { Button } from '@/components/common/Button';
 import { ErrorAlert } from '@/components/common/ErrorAlert';
 import { Input } from '@/components/common/Input';
@@ -22,7 +22,7 @@ export function LoginPage() {
       await login({ email, password });
       navigate('/dashboard');
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Не удалось войти');
+      setError(formatErrorMessage(err, 'Не удалось войти'));
     } finally {
       setSubmitting(false);
     }

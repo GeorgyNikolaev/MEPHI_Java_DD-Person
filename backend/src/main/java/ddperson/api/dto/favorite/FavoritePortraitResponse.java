@@ -9,6 +9,7 @@ import java.util.UUID;
 public record FavoritePortraitResponse(
         UUID id,
         PortraitSummaryDto portrait,
+        UUID generationId,
         String characterDescription,
         EnumLabelDto roleArchetype,
         EnumLabelDto universeStyle,

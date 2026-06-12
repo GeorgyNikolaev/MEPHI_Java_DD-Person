@@ -39,9 +39,12 @@ cd frontend && npm install && npm run dev
 
 Полная инструкция: [docs/launch.md](docs/launch.md)
 
-## Документация
+## Документация и материалы для защиты
 
-- [docs/README.md](docs/README.md) — индекс
+- [docs/README.md](docs/README.md) — индекс технической документации
+- [docs/Отчет.docx](docs/Отчет.docx) — отчёт по проекту
+- [docs/Презентация.pptx](docs/Презентация.pptx) — презентация
+- [docs/report.md](docs/report.md) — тексты разделов отчёта (для копирования в Word)
 - [ARCHITECTURE.md](ARCHITECTURE.md) — архитектура
 - [docs/database.md](docs/database.md) — БД и SQL
 - [docs/test-cases.md](docs/test-cases.md) — тест-кейсы
