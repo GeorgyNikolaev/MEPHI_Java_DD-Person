@@ -1,6 +1,6 @@
 # Sequence: генерация портрета
 
-Интеграционный сценарий от формы до JPG.
+Асинхронный сценарий от формы до JPG.
 
 ```mermaid
 sequenceDiagram
@@ -8,6 +8,7 @@ sequenceDiagram
     participant UI as React Frontend
     participant API as GenerationController
     participant Svc as GenerationService
+    participant RL as GenerationRateLimitService
     participant PB as PromptBuilder
     participant DB as PostgreSQL
     participant Bus as ApplicationEvent
@@ -18,6 +19,8 @@ sequenceDiagram
     User->>UI: Заполняет параметры, «Сгенерировать»
     UI->>API: POST /api/v1/generations (cookies)
     API->>Svc: create(request)
+    Svc->>RL: checkAndIncrement(userId)
+    RL-->>Svc: OK / 429
     Svc->>PB: build(input)
     PB-->>Svc: systemPrompt + userPrompt
     Svc->>DB: INSERT generation_requests (PENDING)
@@ -41,10 +44,6 @@ sequenceDiagram
         API->>DB: SELECT request + portrait
         API-->>UI: status, imageUrl
     end
-
-    User->>UI: «В избранное»
-    UI->>API: POST /portraits/{id}/favorite
-    API->>DB: INSERT favorite_portraits
 ```
 
 ## Участники
@@ -52,6 +51,11 @@ sequenceDiagram
 | Компонент | Роль |
 |-----------|------|
 | `PromptBuilder` | Strategy + Builder: system/user промпт |
-| `GenerationRateLimitService` | Redis: лимит запросов |
+| `GenerationRateLimitService` | Redis: лимит запросов в день/час |
 | `GigaChatImageAdapter` | Port/Adapter к GigaChat |
 | `PortraitStorageService` | JPG на диск |
+
+## Связанные диаграммы
+
+- [sequence-favorites.md](sequence-favorites.md) — избранное
+- [sequence-characters.md](sequence-characters.md) — персонажи и генерация по шаблону
