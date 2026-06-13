@@ -21,6 +21,12 @@
 | [sequence-generation.md](sequence-generation.md) | Sequence: генерация портрета |
 | [sequence-favorites.md](sequence-favorites.md) | Sequence: избранное |
 | [sequence-characters.md](sequence-characters.md) | Sequence: персонажи |
+| [sequence-auth.md](sequence-auth.md) | Sequence: аутентификация (оглавление) |
+| [sequence-auth-register.md](sequence-auth-register.md) | Sequence: регистрация |
+| [sequence-auth-login.md](sequence-auth-login.md) | Sequence: вход |
+| [sequence-auth-protected.md](sequence-auth-protected.md) | Sequence: защищённый запрос |
+| [sequence-auth-refresh.md](sequence-auth-refresh.md) | Sequence: обновление токена |
+| [sequence-auth-logout.md](sequence-auth-logout.md) | Sequence: выход |
 | [use-cases.md](use-cases.md) | Сценарии использования |
 | [test-cases.md](test-cases.md) | Тест-кейсы (ручные и автоматические) |
 | [db/reference-schema.sql](db/reference-schema.sql) | Справочный SQL DDL (для отчёта; runtime — Hibernate) |
